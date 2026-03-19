@@ -1,124 +1,88 @@
 <!DOCTYPE html>
 <html lang="uz">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chatbot</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            padding-top: 40px;
-        }
-
-        .chat-container {
-            width: 400px;
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        /* Rasm uchun yangi dizayn */
-        .profile-pic {
-            display: block;
-            margin: 0 auto 10px auto;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #007bff;
-        }
-
-        h2 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        #chat-box {
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            background: #fafafa;
-        }
-
-        .message {
-            margin: 8px 0;
-            padding: 8px 10px;
-            border-radius: 8px;
-            max-width: 85%;
-            word-wrap: break-word;
-        }
-
-        .user {
-            background: #d1e7ff;
-            text-align: right;
-            margin-left: auto;
-        }
-
-        .bot {
-            background: #e8e8e8;
-            text-align: left;
-            margin-right: auto;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        #message-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        button {
-            padding: 10px 16px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        #typing {
-            font-style: italic;
-            color: #666;
-            margin: 8px 0;
-            font-size: 0.9em;
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding-top: 30px; margin: 0; }
+        .chat-container { width: 95%; max-width: 400px; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        /* Rasm stili */
+        .profile-pic { display: block; margin: 0 auto 10px; width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #007bff; }
+        
+        h2 { text-align: center; margin: 0 0 15px; font-size: 20px; color: #333; }
+        #chat-box { height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
+        
+        .message { margin: 8px 0; padding: 10px 14px; border-radius: 12px; max-width: 85%; font-size: 15px; line-height: 1.5; word-wrap: break-word; white-space: pre-wrap; }
+        .user { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .bot { background: #e9e9eb; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        
+        .input-row { display: flex; gap: 8px; }
+        #message-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        button { padding: 10px 18px; background: #007bff; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        #typing { font-style: italic; color: #777; font-size: 13px; margin: 5px 0; }
     </style>
 </head>
-
 <body>
     <div class="chat-container">
         <img src="/static/images/profile.png" alt="Zafar" class="profile-pic">
-        
         <h2>Creator Zafar</h2>
         <div id="chat-box"></div>
-
         <div class="input-row">
-            <input type="text" id="message-input" placeholder="Xabar yozing..." />
+            <input type="text" id="message-input" placeholder="Xabar yozing..." autocomplete="off">
             <button onclick="sendMessage()">Yuborish</button>
         </div>
     </div>
 
     <script>
+        const chatBox = document.getElementById("chat-box");
         const input = document.getElementById("message-input");
-        const chatBox = document.getElementById("chat-box
+
+        function displayLetterByLetter(text, container) {
+            let index = 0;
+            const interval = setInterval(() => {
+                container.innerHTML += text.charAt(index);
+                index++;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                if (index >= text.length) clearInterval(interval);
+            }, 20);
+        }
+
+        async function sendMessage() {
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatBox.innerHTML += `<div class="message user">${message}</div>`;
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const typingIndicator = document.createElement("div");
+            typingIndicator.id = "typing";
+            typingIndicator.innerText = "AI yozmoqda..."; // Siz xohlagandek o'zgartirildi
+            chatBox.appendChild(typingIndicator);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+                typingIndicator.remove();
+
+                const botMsgDiv = document.createElement("div");
+                botMsgDiv.className = "message bot";
+                chatBox.appendChild(botMsgDiv);
+                displayLetterByLetter(data.reply, botMsgDiv);
+            } catch (e) {
+                typingIndicator.remove();
+                chatBox.innerHTML += `<div class="message bot">Xatolik yuz berdi.</div>`;
+            }
+        }
+
+        input.onkeydown = (e) => { if(e.key === "Enter") sendMessage(); };
+    </script>
+</body>
+</html>
