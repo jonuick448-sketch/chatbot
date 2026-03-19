@@ -10,10 +10,7 @@ load_dotenv()
 
 app = FastAPI()
 
-# Rasm va boshqa fayllar ishlashi uchun shart:
-if not os.path.exists("static"):
-    os.makedirs("static/images", exist_ok=True)
-
+# Statik fayllar (rasm) ishlashi uchun asosiy qator
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -23,8 +20,11 @@ class ChatRequest(BaseModel):
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
+    try:
+        with open("index.html", "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "index.html topilmadi!"
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
