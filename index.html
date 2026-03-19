@@ -7,76 +7,67 @@
     <title>AI Chatbot</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
             display: flex;
             justify-content: center;
             padding-top: 40px;
-            margin: 0;
         }
 
         .chat-container {
-            width: 100%;
-            max-width: 400px;
+            width: 400px;
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* RASM UCHUN STIL */
+        /* Rasm uchun yangi dizayn */
         .profile-pic {
             display: block;
             margin: 0 auto 10px auto;
-            width: 85px;
-            height: 85px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #007bff;
-            background: #eee;
         }
 
         h2 {
             text-align: center;
-            margin: 0 0 20px 0;
+            margin-top: 0;
+            margin-bottom: 20px;
             color: #333;
-            font-size: 22px;
         }
 
         #chat-box {
             height: 400px;
             overflow-y: auto;
-            border: 1px solid #eee;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            background: #f9f9f9;
-            display: flex;
-            flex-direction: column;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #fafafa;
         }
 
         .message {
-            margin: 10px 0;
-            padding: 10px 14px;
-            border-radius: 15px;
-            max-width: 80%;
-            line-height: 1.4;
+            margin: 8px 0;
+            padding: 8px 10px;
+            border-radius: 8px;
+            max-width: 85%;
             word-wrap: break-word;
-            font-size: 15px;
         }
 
         .user {
-            background: #007bff;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
+            background: #d1e7ff;
+            text-align: right;
+            margin-left: auto;
         }
 
         .bot {
-            background: #e9e9eb;
-            color: #333;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
+            background: #e8e8e8;
+            text-align: left;
+            margin-right: auto;
         }
 
         .input-row {
@@ -86,36 +77,31 @@
 
         #message-input {
             flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             outline: none;
-            transition: border 0.3s;
-        }
-
-        #message-input:focus {
-            border-color: #007bff;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 16px;
             cursor: pointer;
-            background: #007bff;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 25px;
-            font-weight: bold;
+            border-radius: 5px;
+            transition: background 0.3s;
         }
 
         button:hover {
-            background: #0056b3;
+            background-color: #0056b3;
         }
 
         #typing {
             font-style: italic;
-            color: #888;
-            margin: 5px 0;
-            font-size: 13px;
+            color: #666;
+            margin: 8px 0;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -128,67 +114,11 @@
         <div id="chat-box"></div>
 
         <div class="input-row">
-            <input type="text" id="message-input" placeholder="Xabar yozing..." autocomplete="off" />
+            <input type="text" id="message-input" placeholder="Xabar yozing..." />
             <button onclick="sendMessage()">Yuborish</button>
         </div>
     </div>
 
     <script>
         const input = document.getElementById("message-input");
-        const chatBox = document.getElementById("chat-box");
-
-        input.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        function displayLetterByLetter(text, container) {
-            let index = 0;
-            const interval = setInterval(() => {
-                container.innerText += text.charAt(index);
-                index++;
-                chatBox.scrollTop = chatBox.scrollHeight;
-                if (index >= text.length) clearInterval(interval);
-            }, 20);
-        }
-
-        async function sendMessage() {
-            const message = input.value.trim();
-            if (!message) return;
-
-            chatBox.innerHTML += `<div class="message user">${message}</div>`;
-            input.value = "";
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            const typingIndicator = document.createElement("div");
-            typingIndicator.id = "typing";
-            typingIndicator.innerText = "Zafar AI yozmoqda...";
-            chatBox.appendChild(typingIndicator);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const response = await fetch("/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message })
-                });
-
-                const data = await response.json();
-                typingIndicator.remove();
-
-                const botMessageDiv = document.createElement("div");
-                botMessageDiv.className = "message bot";
-                chatBox.appendChild(botMessageDiv);
-                displayLetterByLetter(data.reply, botMessageDiv);
-
-            } catch (error) {
-                if(typingIndicator) typingIndicator.remove();
-                chatBox.innerHTML += `<div class="message bot">Xatolik yuz berdi</div>`;
-            }
-        }
-    </script>
-</body>
-
-</html>
+        const chatBox = document.getElementById("chat-box
